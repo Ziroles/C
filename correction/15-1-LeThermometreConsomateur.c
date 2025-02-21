@@ -7,8 +7,8 @@ int main() {
     const char* CHEMIN = "/thermometre";
     const char FIN = -128;
     const size_t TAILLE = sizeof(char);
-    int mem = shm_open(CHEMIN, O_RDONLY, 0666);
-    if(mem==-1) {perror("shm_open : "); return 1; }
+    int mem = shm_open(CHEMIN, O_CREAT|O_RDWR, 0666); //création mémoire partager
+    if(mem==-1) {perror("shm_open : "); return 1; } 
     char* ptemp = mmap(NULL, TAILLE, PROT_READ, MAP_SHARED, mem, 0);
     if(ptemp == MAP_FAILED) { perror("mmap : "); return 3; }
     while(*ptemp!=FIN) {

@@ -4,44 +4,40 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <signal.h>
-
-void timer(pid_t parent_pid, int *stop, int *time)
+int stop = 0;
+int time = 0;
+void timer()
 {
 
     while (1)
     {
-        while (*stop == 0)
+        if (stop == 0)
         {
             sleep(1);
-            time--;
-            return;
+            printf("time = %d\n", time);
+            time++;
         }
     }
-    return;
 }
 
-handle_sigtstp(int *sig, int *time)
+void handle_sigtstp(int signal)
 {
-
-    *sig = 1;
-
-    printf("Signal SIGTSTP reçu time = %d\n", *time);
+    stop = stop == 0;
+    printf("Signal SIGTSTP reçu %d , time = %d\n ", signal, time);
     return;
 }
 int main()
 {
-    int time = 0;
-    int stop = 0;
-    signal(SIGTSTP, handle_sigtstp(&stop, &time));
+
+    signal(SIGTSTP, handle_sigtstp);
     pid_t pid1;
 
     pid1 = fork();
     if (pid1 == 0)
     {
 
-        timer(getppid(), &stop, &time);
-        return 0;
+        timer();
     }
-
+    wait(NULL);
     return 0;
 }
